@@ -1,9 +1,12 @@
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import csv
 
 
+# this is used to save the animation. if you want to save it uncomment next line.
+# matplotlib.use("Agg")
 # number of items returned in each iteration by the generator function.
 ITEMS_IN_EACH_ITR = 5
 
@@ -45,9 +48,14 @@ class Scope:
             self.ax.plot(self.tdata[self.end:self.start],
                 self.ydata[self.end:self.start], 'b')
 
-    def show(self):
-        ani = animation.FuncAnimation(fig, scope.update, emitter,interval=50)
-        plt.show()
+    def show(self, new_data_function, save=False):
+        ani = animation.FuncAnimation(fig, scope.update, new_data_function,interval=50)
+        if save:
+            Writer = animation.writers['ffmpeg']
+            writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
+            ani.save('animation.mp4', writer=writer)
+        else:
+            plt.show()
 
 
 # a generator function that returns a list of new data.
@@ -67,4 +75,4 @@ def emitter():
 if __name__ == '__main__':
     fig, ax = plt.subplots()
     scope = Scope(ax)
-    scope.show()
+    scope.show(emitter, save=False)
